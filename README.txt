@@ -12,7 +12,7 @@ This variable indicates who the system administrator is based on the email.
 
 Your CV management system will be functional after these steps have been taken.
 
-Present Admin are " email: k1234567@kingston.ac.uk / steph@gmail.com; password: kingston (for both) "
+Present Admin are " email: k2021984@kingston.ac.uk / "Osubor, Michelle C" <k2056884@kingston.ac.uk>; password: ..... "
 
 
 
@@ -20,5 +20,5 @@ Cordially, Michelle Osubor and Anthony Eneremadu
 
 Contributions
 Testing:  Michelle Osubor and Anthony Eneremadu
-Design Documentation:  Anthony Eneremadu
-Coding:  Michelle Osubor
+Design Documentation and coding/testing:  Anthony Eneremadu
+Coding and testing:  Michelle Osubor
