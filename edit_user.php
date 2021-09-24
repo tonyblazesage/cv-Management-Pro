@@ -1,0 +1,232 @@
+<?php
+include('config.php');
+if(isset($_SESSION['email']))
+{
+	if(isset(
+		$_POST['firstname'], $_POST['lastname'], $_POST['email'], $_POST['password'], $_POST['contact_number'], $_POST['date_of_birth'], $_POST['gender'], $_POST['city'], $_POST['country'], $_POST['postcode'], $_POST['linkedin'], $_POST['website']
+	))
+	{
+		if(get_magic_quotes_gpc())
+		{
+			$_POST['firstname'] = stripslashes($_POST['firstname']);
+			$_POST['lastname'] = stripslashes($_POST['lastname']);
+			$_POST['email'] = stripslashes($_POST['email']);
+			$_POST['password'] = stripslashes($_POST['password']);
+			$_POST['contact_number'] = stripslashes($_POST['contact_number']);
+			$_POST['date_of_birth'] = stripslashes($_POST['date_of_birth']);
+			$_POST['gender'] = stripslashes($_POST['gender']);
+			$_POST['city'] = stripslashes($_POST['city']);
+			$_POST['country'] = stripslashes($_POST['country']);
+			$_POST['postcode'] = stripslashes($_POST['postcode']);
+			$_POST['linkedin'] = stripslashes($_POST['linkedin']);
+			$_POST['website'] = stripslashes($_POST['website']);
+		}
+		if(preg_match('#^(([a-z0-9!\#$%&\\\'*+/=?^_`{|}~-]+\.?)*[a-z0-9!\#$%&\\\'*+/=?^_`{|}~-]+)@(([a-z0-9-_]+\.?)*[a-z0-9-_]+)\.[a-z]{2,}$#i',$_POST['email']))
+		{
+			$firstname = mysqli_real_escape_string($con,$_POST['firstname']);
+			$lastname = mysqli_real_escape_string($con,$_POST['lastname']);
+			$email = mysqli_real_escape_string($con,$_POST['email']);
+			$password = mysqli_real_escape_string($con,sha1($_POST['password']));
+			$contact_number = mysqli_real_escape_string($con,$_POST['contact_number']);
+			$date_of_birth = mysqli_real_escape_string($con,$_POST['date_of_birth']);
+			$gender = mysqli_real_escape_string($con,$_POST['gender']);
+			$city = mysqli_real_escape_string($con,$_POST['city']);
+			$country = mysqli_real_escape_string($con,$_POST['country']);
+			$postcode = mysqli_real_escape_string($con,$_POST['postcode']);
+			$linkedin = mysqli_real_escape_string($con,$_POST['linkedin']);
+			$website = mysqli_real_escape_string($con,$_POST['website']);
+										//important
+			$dn = mysqli_num_rows(mysqli_query($con,"select * from user_account where email='$email'"));
+			if($dn==0 or $_POST['email']==$_SESSION['email'])
+			{
+				if(mysqli_query($con,'update user_account set firstname="'.$firstname.'",lastname="'.$lastname.'", email= "'.$email.'", password="'.$password.'", contact_number="'.$contact_number.'", date_of_birth="'.$date_of_birth.'", gender="'.$gender.'", city="'.$city.'", country="'.$country.'", postcode="'.$postcode.'", linkedin= "'.$linkedin.'", website="'.$website.'" where id="'.mysqli_real_escape_string($con, $_SESSION['userid']).'"'))
+				{
+					$form = false;
+					$_SESSION['email'] = $_POST['email'];
+					$_SESSION['userid'] = $dn['id'];
+					if(isset($_POST['memorize']) and $_POST['memorize']=='yes')
+					{
+						$one_year = time()+(60*60*24*365);
+						setcookie('email', $_POST['email'], $one_year);
+						setcookie('password', sha1($password), $one_year);
+					}
+
+                    header ('location: profile.php'); 
+				}
+				else
+				{
+					$form = true;
+					$message = 'An error occured while editing your profile.';
+				}
+			}
+			else
+			{
+				$form = true;
+				$message = 'Another user already uses this username.';
+			}
+		}
+		else
+		{
+			$form = true;
+			$message = 'The email you typed is not valid.';
+		}
+	}
+	else
+	{
+		$form = true;
+	}
+	if($form)
+	{
+		if(isset($message))
+		{
+			echo '<div class="message bg-warning">'.$message.'</div>';
+		}
+
+		if(isset(
+			$_POST['firstname'], $_POST['lastname'], $_POST['email'], $_POST['password'], $_POST['contact_number'], $_POST['date_of_birth'], $_POST['gender'], $_POST['city'], $_POST['country'], $_POST['postcode'], $_POST['linkedin'], $_POST['website']
+		))
+		{
+			$firstname = htmlentities($_POST['firstname'], ENT_QUOTES, 'UTF-8');
+			$lastname = htmlentities($_POST['lastname'], ENT_QUOTES, 'UTF-8');
+			$email = htmlentities($_POST['email'], ENT_QUOTES, 'UTF-8');
+			$password = htmlentities($_POST['password'], ENT_QUOTES, 'UTF-8');
+			$contact_number = htmlentities($_POST['contact_number'], ENT_QUOTES, 'UTF-8');
+			$date_of_birth = htmlentities($_POST['date_of_birth'], ENT_QUOTES, 'UTF-8');
+			$gender = htmlentities($_POST['gender'], ENT_QUOTES, 'UTF-8');
+			$city = htmlentities($_POST['city'], ENT_QUOTES, 'UTF-8');
+			$country = htmlentities($_POST['country'], ENT_QUOTES, 'UTF-8');
+			$postcode = htmlentities($_POST['postcode'], ENT_QUOTES, 'UTF-8');
+			$linkedin = htmlentities($_POST['linkedin'], ENT_QUOTES, 'UTF-8');
+			$website = htmlentities($_POST['website'], ENT_QUOTES, 'UTF-8');
+		}
+		else
+		{
+			$dn2 = mysqli_fetch_array(mysqli_query($con,'select * from user_account where email="'.$_SESSION['email'].'"'));
+												//no update
+			$firstname = htmlentities($dn2['firstname'], ENT_QUOTES, 'UTF-8');
+			$lastname = htmlentities($dn2['lastname'], ENT_QUOTES, 'UTF-8');
+			$email = htmlentities($dn2['email'], ENT_QUOTES, 'UTF-8');
+			$password = htmlentities($dn2['password'], ENT_QUOTES, 'UTF-8');
+			$contact_number = htmlentities($dn2['contact_number'], ENT_QUOTES, 'UTF-8');
+			$date_of_birth = htmlentities($dn2['date_of_birth'], ENT_QUOTES, 'UTF-8');
+			$gender = htmlentities($dn2['gender'], ENT_QUOTES, 'UTF-8');
+			$city = htmlentities($dn2['city'], ENT_QUOTES, 'UTF-8');
+			$country = htmlentities($dn2['country'], ENT_QUOTES, 'UTF-8');
+			$postcode = htmlentities($dn2['postcode'], ENT_QUOTES, 'UTF-8');
+			$linkedin = htmlentities($dn2['linkedin'], ENT_QUOTES, 'UTF-8');
+			$website = htmlentities($dn2['website'], ENT_QUOTES, 'UTF-8');
+		}
+		?>
+		<!DOCTYPE html>
+		<html lang="en">
+
+		<head>
+			<title>Register:CV-Pro</title>
+			<meta charset="utf-8">
+			<meta name="viewport" content="width=device-width, initial-scale=1">
+			<link rel="stylesheet" href="css/style.css">
+			<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+			<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+			<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+			<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+			<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+		</head>
+		<!--body-->
+
+		<body >
+
+<!--Nav bar-->
+<div class="" style="padding:15px;">
+    <?php include('navbar.php'); ?>
+    <br>
+</div>
+<br>
+
+
+			<!-- form group-->
+			<div class="col-sm-7  form1">
+				<h3 class="text-center mt-3">Personal Details</h3>
+				<div class="card" style="padding: 20px;">
+					<form class="row g-4  " action="edit_user.php" method="post">
+<div class="col-md-6 form-group">
+							<label for="firstName" class="form-label">First Name*</label>
+							<input type="name" class="form-control" id="firstName" name="firstname" value="<?php echo $firstname; ?>" >
+						</div>
+						<div class="col-md-6 form-group">
+							<label for="LastName" class="form-label">Last Name</label>
+							<input type="name" class="form-control" id="LastName" name="lastname" value="<?php echo $lastname; ?>">
+						</div>
+						<div class="col-md-6 form-group">
+							<label for="email" class="form-label">Email*</label>
+							<input type="email" class="form-control" id="email" name="email" value="<?php echo $email; ?>">
+						</div>
+						<div class="col-md-6 form-group">
+							<label for="password" class="form-label">Password*</label>
+							<section class="pwdeye input-group" id="pwdeye" type="text">
+								<input type="password" class=" form-control" placeholder="Please update password" id="password" name="password" data-toggle="password" required>
+								<div class="input-group-prepend" onclick="myFunction()">
+									<span type="button" class="btn btn-secondary"> <i id="pwdi" class="fa fa-eye-slash"></i> </span>
+								</div>
+							</section>
+						</div>
+						<div class="col-md-6 form-group">
+							<label for="contact_number" class="form-label">Phone number</label>
+							<input class="form-control" type="text" id="contact_number" name="contact_number" value="<?php echo $contact_number; ?>">
+						</div>
+						<div class="col-md-3 form-group">
+							<label for="date_of_birth" class="form-label">Date of birth</label>
+							<input class="form-control" type="date" id="date_of_birth" name="date_of_birth" value="<?php echo $date_of_birth; ?>">
+						</div>
+						<div class="col-md-3 form-group">
+							<label for="gender" class="form-label">Gender</label>
+							<select class="form-control" id="gender" name="gender" >
+							    <option value="<?php echo $gender; ?>"><?php echo $gender; ?></option>
+								<option value="">Select</option>
+								<option value="male">Male</option>
+								<option value="female">Female</option>
+							</select>
+						</div>
+						<div class="col-md-6 form-group">
+							<label for="city" class="form-label">City</label>
+							<input type="text" class="form-control" id="city" name="city" value="<?php echo $city; ?>">
+						</div>
+						<div class="col-md-4 form-group">
+							<label for="inputCountry" class="form-label">country</label>
+							<input type="text" class="form-control" id="inputCountry" name="country" value="<?php echo $country; ?>" >
+						</div>
+						<div class="col-md-2 form-group">
+							<label for="inputZip" class="form-label">Post Code</label>
+							<input type="text" class="form-control" id="inputZip" name="postcode" value="<?php echo $postcode; ?>">
+						</div>
+						<div class="col-md-6 form-group">
+							<label for="linkedIn" class="form-label">LinkedIn</label>
+							<input type="text" class="form-control" id="linkedIn" name="linkedin" value="<?php echo $linkedin; ?>">
+						</div>
+						<div class="col-md-6 form-group">
+							<label for="website" class="form-label">website</label>
+							<input type="text" class="form-control" id="website" name="website" value="<?php echo $website; ?>">
+						</div>
+						</div>
+						<div class="mt-3">
+						<button type="submit" name="submit" class="btn btn-primary ml-auto mr-4 mt-3">Update <i class='fa fa-angle-right'></i></button>
+						</div>
+					</form>
+				</div>
+			</div>
+
+
+			<script src="javascript/control.js"></script>
+
+		</body>
+
+		</html>
+
+		<?php
+	}
+}
+else
+{
+	?>
+	<?php include 'sign-in.php';?>
+	<?php
+}
